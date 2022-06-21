@@ -1,0 +1,34 @@
+spring:
+  profiles:
+    active: local
+  application:
+    name: google-ads-api-trial
+  devtools:
+    restart:
+      enabled: false
+
+server:
+  port: 9081
+
+management:
+  server:
+    port: 39081
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+api:
+  googleads:
+    clientId:
+    clientSecret:
+    refreshToken:
+    developerToken:
