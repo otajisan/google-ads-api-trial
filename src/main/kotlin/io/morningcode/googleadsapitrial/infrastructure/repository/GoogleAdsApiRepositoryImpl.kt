@@ -1,4 +1,4 @@
-package io.morningcode.googleadsapitrial.infrastructure
+package io.morningcode.googleadsapitrial.infrastructure.repository
 
 import com.google.ads.googleads.lib.GoogleAdsClient
 import com.google.ads.googleads.v11.services.ListAccessibleCustomersRequest
@@ -6,6 +6,7 @@ import com.google.ads.googleads.v11.services.SearchGoogleAdsStreamRequest
 import com.google.auth.oauth2.UserCredentials
 import io.grpc.StatusRuntimeException
 import io.morningcode.googleadsapitrial.configuration.GoogleAdsConfiguration
+import io.morningcode.googleadsapitrial.domain.model.Customer
 import io.morningcode.googleadsapitrial.exception.ApiUnexpectedException
 import io.morningcode.googleadsapitrial.util.logger
 import org.springframework.stereotype.Repository
@@ -53,19 +54,23 @@ class GoogleAdsApiRepositoryImpl(
         googleAdsClient.toBuilder().setCredentials(it).build()
       }
 
-  override fun getAccessibleCustomers() {
+  override fun getAccessibleCustomers(): List<Customer>? {
     val client = buildClient()
-    try {
+
+    return try {
       client.latestVersion.createCustomerServiceClient().use { customerService ->
         val response = customerService.listAccessibleCustomers(ListAccessibleCustomersRequest.newBuilder().build())
         response.resourceNamesList.map { customerResourceName ->
           log.info("accessible customer name: $customerResourceName")
+          Customer(customerId = Customer.CustomerId(customerResourceName))
         }
       }
     } catch (ex: IOException) {
       log.error("failed to fetch accessible customers. ", ex)
+      null
     } catch (ex: StatusRuntimeException) {
       log.error("restricted to fetch customers.", ex)
+      null
     }
   }
 

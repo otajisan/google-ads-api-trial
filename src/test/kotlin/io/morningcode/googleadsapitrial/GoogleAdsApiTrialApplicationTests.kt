@@ -1,6 +1,6 @@
 package io.morningcode.googleadsapitrial
 
-import io.morningcode.googleadsapitrial.application.GoogleAdsApiController
+import io.morningcode.googleadsapitrial.application.controller.GoogleAdsApiController
 import org.junit.jupiter.api.Test
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.beans.factory.annotation.Autowired
