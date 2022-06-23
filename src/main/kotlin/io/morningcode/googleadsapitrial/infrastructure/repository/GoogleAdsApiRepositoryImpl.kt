@@ -1,15 +1,15 @@
 package io.morningcode.googleadsapitrial.infrastructure.repository
 
 import com.google.ads.googleads.lib.GoogleAdsClient
-import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum
-import com.google.ads.googleads.v11.enums.BudgetDeliveryMethodEnum
-import com.google.ads.googleads.v11.enums.CampaignStatusEnum
+import com.google.ads.googleads.v11.common.AdVideoAsset
 import com.google.ads.googleads.v11.resources.Campaign
 import com.google.ads.googleads.v11.resources.CampaignBudget
 import com.google.ads.googleads.v11.resources.CustomerClient
 import com.google.ads.googleads.v11.services.*
 import com.google.ads.googleads.v11.common.ManualCpc
-import com.google.ads.googleads.v11.enums.AdvertisingChannelSubTypeEnum
+import com.google.ads.googleads.v11.common.YoutubeVideoAsset
+import com.google.ads.googleads.v11.enums.*
+import com.google.ads.googleads.v11.resources.Asset
 import com.google.auth.oauth2.UserCredentials
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
@@ -170,9 +170,13 @@ class GoogleAdsApiRepositoryImpl(
   override fun addCampaign(loginCustomerId: Long?, customerId: Long) {
     val client = buildClient(loginCustomerId)
 
-    val budgetResourceName = addCampaignBudget(client, customerId)
+    // TODO:
+    val videoId = ""
 
-   val campaign = Campaign.newBuilder()
+    val budgetResourceName = addCampaignBudget(client, customerId)
+    val youtubeVideoAssetResourceName = addYouTubeVideoAsset(client, customerId, videoId)
+
+    val campaign = Campaign.newBuilder()
         .setName("my test campaign name #" + UUID.randomUUID())
         .setAdvertisingChannelType(AdvertisingChannelTypeEnum.AdvertisingChannelType.SEARCH)
         .setStatus(CampaignStatusEnum.CampaignStatus.PAUSED)
@@ -193,6 +197,30 @@ class GoogleAdsApiRepositoryImpl(
       log.error("failed to fetch campaigns. ", ex)
     } catch (ex: StatusRuntimeException) {
       log.error("restricted to fetch campaigns.", ex)
+    }
+  }
+
+  private fun addYouTubeVideoAsset(client: GoogleAdsClient, customerId: Long, videoId: String): String {
+    val asset = Asset.newBuilder()
+        .setName("my youtube video asset #" + UUID.randomUUID())
+        .setType(AssetTypeEnum.AssetType.YOUTUBE_VIDEO)
+        .setYoutubeVideoAsset(YoutubeVideoAsset.newBuilder().setYoutubeVideoId(videoId))
+        .build()
+    val operation = AssetOperation.newBuilder().setCreate(asset).build()
+
+    try {
+      client.latestVersion.createAssetServiceClient().use { assetServiceClient ->
+        val response = assetServiceClient.mutateAssets(customerId.toString(), listOf(operation))
+        log.info("created new youtube video asset. response: $response")
+        return response.getResults(0).resourceName
+      }
+
+    } catch (ex: IOException) {
+      log.error("failed to create campaign budget. ", ex)
+      throw ApiUnexpectedException("failed to create campaign budget.")
+    } catch (ex: StatusRuntimeException) {
+      log.error("restricted to create campaign budget.", ex)
+      throw ApiUnexpectedException("restricted to create campaign budget.")
     }
   }
 
