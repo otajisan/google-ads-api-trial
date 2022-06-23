@@ -120,6 +120,31 @@ class GoogleAdsApiController(
   }
 
   /**
+   * Create new campaign
+   *
+   * @param loginCustomerId Google Ads Login Customer ID
+   * @param customerId Google Ads Customer ID
+   * @return Response message "pong"
+   */
+  @Operation(summary = "create new campaign")
+  @ApiResponses(
+      value = [
+        ApiResponse(responseCode = "200", description = "Success"),
+        ApiResponse(responseCode = "400", description = "Bad request"),
+        ApiResponse(responseCode = "401", description = "Unauthorized"),
+        ApiResponse(responseCode = "500", description = "Internal server error")
+      ]
+  )
+  @ResponseStatus(HttpStatus.OK)
+  @PostMapping(value = ["/campaigns/{loginCustomerId}/{customerId}"])
+  fun createNewCampaign(
+      @PathVariable("loginCustomerId") loginCustomerId: Long,
+      @PathVariable("customerId") customerId: Long
+  ) {
+    campaigns.save(loginCustomerId, customerId)
+  }
+
+  /**
    * Greeting Message
    *
    * @param name your name please

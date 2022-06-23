@@ -1,13 +1,19 @@
 package io.morningcode.googleadsapitrial.infrastructure.repository
 
 import com.google.ads.googleads.lib.GoogleAdsClient
+import com.google.ads.googleads.v11.enums.AdvertisingChannelTypeEnum
+import com.google.ads.googleads.v11.enums.BudgetDeliveryMethodEnum
+import com.google.ads.googleads.v11.enums.CampaignStatusEnum
+import com.google.ads.googleads.v11.resources.Campaign
+import com.google.ads.googleads.v11.resources.CampaignBudget
 import com.google.ads.googleads.v11.resources.CustomerClient
-import com.google.ads.googleads.v11.services.ListAccessibleCustomersRequest
-import com.google.ads.googleads.v11.services.SearchGoogleAdsRequest
-import com.google.ads.googleads.v11.services.SearchGoogleAdsStreamRequest
+import com.google.ads.googleads.v11.services.*
+import com.google.ads.googleads.v11.common.ManualCpc
+import com.google.ads.googleads.v11.enums.AdvertisingChannelSubTypeEnum
 import com.google.auth.oauth2.UserCredentials
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
+import com.google.type.DateTime
 import io.grpc.StatusRuntimeException
 import io.morningcode.googleadsapitrial.configuration.GoogleAdsConfiguration
 import io.morningcode.googleadsapitrial.domain.model.Customer
@@ -16,6 +22,8 @@ import io.morningcode.googleadsapitrial.util.logger
 import org.springframework.stereotype.Repository
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.annotation.PostConstruct
 
@@ -156,6 +164,60 @@ class GoogleAdsApiRepositoryImpl(
       log.error("failed to fetch campaigns. ", ex)
     } catch (ex: StatusRuntimeException) {
       log.error("restricted to fetch campaigns.", ex)
+    }
+  }
+
+  override fun addCampaign(loginCustomerId: Long?, customerId: Long) {
+    val client = buildClient(loginCustomerId)
+
+    val budgetResourceName = addCampaignBudget(client, customerId)
+
+   val campaign = Campaign.newBuilder()
+        .setName("my test campaign name #" + UUID.randomUUID())
+        .setAdvertisingChannelType(AdvertisingChannelTypeEnum.AdvertisingChannelType.SEARCH)
+        .setStatus(CampaignStatusEnum.CampaignStatus.PAUSED)
+        .setManualCpc(ManualCpc.newBuilder().build())
+        .setCampaignBudget(budgetResourceName)
+        .setStartDate(LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd")))
+        .setEndDate(LocalDateTime.now().plusDays(2).format(DateTimeFormatter.ofPattern("yyyyMMdd")))
+        .build()
+
+    val operation = CampaignOperation.newBuilder().setCreate(campaign).build()
+
+    try {
+      client.latestVersion.createCampaignServiceClient().use { campaignServiceClient ->
+        val response = campaignServiceClient.mutateCampaigns(customerId.toString(), listOf(operation))
+        log.info("created new campaign. response: $response")
+      }
+    } catch (ex: IOException) {
+      log.error("failed to fetch campaigns. ", ex)
+    } catch (ex: StatusRuntimeException) {
+      log.error("restricted to fetch campaigns.", ex)
+    }
+  }
+
+  private fun addCampaignBudget(client: GoogleAdsClient, customerId: Long): String {
+    val budget = CampaignBudget.newBuilder()
+        .setName("my test campaign budget name #" + UUID.randomUUID())
+        .setDeliveryMethod(BudgetDeliveryMethodEnum.BudgetDeliveryMethod.STANDARD)
+        // NOTE: equals 1 yen
+        .setAmountMicros(1000_000)
+        .build()
+
+    val operation = CampaignBudgetOperation.newBuilder().setCreate(budget).build()
+
+    try {
+      client.latestVersion.createCampaignBudgetServiceClient().use { campaignBudgetServiceClient ->
+        val response = campaignBudgetServiceClient.mutateCampaignBudgets(customerId.toString(), listOf(operation))
+        log.info("created new campaign budget. response: $response")
+        return response.getResults(0).resourceName
+      }
+    } catch (ex: IOException) {
+      log.error("failed to create campaign budget. ", ex)
+      throw ApiUnexpectedException("failed to create campaign budget.")
+    } catch (ex: StatusRuntimeException) {
+      log.error("restricted to create campaign budget.", ex)
+      throw ApiUnexpectedException("restricted to create campaign budget.")
     }
   }
 }

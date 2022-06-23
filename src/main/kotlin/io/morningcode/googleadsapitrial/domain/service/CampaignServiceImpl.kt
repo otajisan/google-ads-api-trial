@@ -12,4 +12,8 @@ class CampaignServiceImpl(private val googleAdsApiRepository: GoogleAdsApiReposi
 
   override fun asList(loginCustomerId: Long, customerId: Long) =
       googleAdsApiRepository.getCampaigns(loginCustomerId, customerId)
+
+  override fun save(loginCustomerId: Long, customerId: Long) {
+    googleAdsApiRepository.addCampaign(loginCustomerId, customerId)
+  }
 }
