@@ -4,5 +4,7 @@ import io.morningcode.googleadsapitrial.domain.model.Customer
 
 interface GoogleAdsApiRepository {
   fun getAccessibleCustomers(): List<Customer>?
-  fun getCampaigns(customerId: String)
+  fun getAccountHierarchy(loginCustomerId: Long)
+  fun getCampaigns(customerId: Long)
+  fun getCampaigns(loginCustomerId: Long?, customerId: Long)
 }
