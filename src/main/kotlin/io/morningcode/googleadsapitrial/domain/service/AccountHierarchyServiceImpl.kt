@@ -6,9 +6,10 @@ import org.springframework.stereotype.Service
 @Service
 class AccountHierarchyServiceImpl(
     private val googleAdsApiRepository: GoogleAdsApiRepository
-): AccountHierarchyService {
+) : AccountHierarchyService {
 
-  override fun asList(seedCustomerId: Long) {
-    googleAdsApiRepository.getAccountHierarchy(seedCustomerId)
-  }
+  override fun asList(loginCustomerId: Long) = asList(loginCustomerId, loginCustomerId)
+
+  override fun asList(loginCustomerId: Long, managerId: Long) = googleAdsApiRepository.getAccountHierarchy(loginCustomerId, managerId)
+
 }

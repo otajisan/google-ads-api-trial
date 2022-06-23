@@ -84,7 +84,7 @@ class GoogleAdsApiRepositoryImpl(
     }
   }
 
-  override fun getAccountHierarchy(loginCustomerId: Long) {
+  override fun getAccountHierarchy(loginCustomerId: Long, managerId: Long) {
     val client = buildClient(loginCustomerId)
 
     try {
@@ -98,7 +98,7 @@ class GoogleAdsApiRepositoryImpl(
             + "WHERE customer_client.level <= 1")
 
         val searchCustomerIds = LinkedList<Long>()
-        searchCustomerIds.add(loginCustomerId)
+        searchCustomerIds.add(managerId)
 
         // search all hierarchy recursively
         while (searchCustomerIds.isNotEmpty()) {
@@ -115,7 +115,7 @@ class GoogleAdsApiRepositoryImpl(
             log.info("get the customer. $customerClient")
 
             if (customerClient.id!=searchCustomerId &&
-                customerClient.id!=loginCustomerId) {
+                customerClient.id!=managerId) {
               // put result
               resultHierarchy.put(searchCustomerId, customerClient)
               // add next entry

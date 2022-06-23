@@ -53,6 +53,27 @@ class GoogleAdsApiController(
   }
 
   /**
+   * Get account hierarchy
+   */
+  @Operation(summary = "get account hierarchy")
+  @ApiResponses(
+      value = [
+        ApiResponse(responseCode = "200", description = "Success"),
+        ApiResponse(responseCode = "400", description = "Bad request"),
+        ApiResponse(responseCode = "401", description = "Unauthorized"),
+        ApiResponse(responseCode = "500", description = "Internal server error")
+      ]
+  )
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value = ["/account/hierarchy/{customerId}/{managerId}"])
+  fun getAccountHierarchyByManagerId(
+      @PathVariable("customerId") customerId: Long,
+      @PathVariable("managerId") managerId: Long
+  ) {
+    accountHierarchyService.asList(customerId, managerId)
+  }
+
+  /**
    * Get campaign list by Customer ID
    *
    * @param customerId Google Ads Customer ID

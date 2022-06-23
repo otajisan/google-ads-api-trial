@@ -1,5 +1,6 @@
 package io.morningcode.googleadsapitrial.domain.service
 
 interface AccountHierarchyService {
-  fun asList(seedCustomerId: Long)
+  fun asList(loginCustomerId: Long)
+  fun asList(loginCustomerId: Long, managerId: Long)
 }
