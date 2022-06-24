@@ -77,6 +77,10 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+  // Spring Security
+  implementation("org.springframework.boot:spring-boot-starter-security")
+  implementation("org.springframework.security:spring-security-oauth2-client")
+  implementation("org.springframework.security:spring-security-oauth2-jose")
   // Google Ads SDK
   implementation("com.google.api-ads:google-ads:${googleAdsSdkVersion}")
   // Open API

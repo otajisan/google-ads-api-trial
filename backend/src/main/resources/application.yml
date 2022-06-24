@@ -3,6 +3,14 @@ spring:
     active: local
   application:
     name: google-ads-api-trial
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            provider: google
+            client-id:
+            client-secret:
   devtools:
     restart:
       enabled: false
