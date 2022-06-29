@@ -7,5 +7,5 @@ interface GoogleAdsApiRepository {
   fun getAccountHierarchy(loginCustomerId: Long, managerId: Long)
   fun getCampaigns(customerId: Long)
   fun getCampaigns(loginCustomerId: Long?, customerId: Long)
-  fun addCampaign(loginCustomerId: Long?, customerId: Long)
+  fun addCampaign(loginCustomerId: Long?, customerId: Long, videoId: String)
 }

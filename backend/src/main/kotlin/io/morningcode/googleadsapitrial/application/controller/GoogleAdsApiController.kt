@@ -1,5 +1,6 @@
 package io.morningcode.googleadsapitrial.application.controller
 
+import io.morningcode.googleadsapitrial.application.input.CreateNewCampaignRequest
 import io.morningcode.googleadsapitrial.application.output.GetAccessibleCustomersOutputData
 import io.morningcode.googleadsapitrial.domain.service.AccountHierarchyService
 import io.morningcode.googleadsapitrial.domain.service.CampaignService
@@ -139,9 +140,10 @@ class GoogleAdsApiController(
   @PostMapping(value = ["/campaigns/{loginCustomerId}/{customerId}"])
   fun createNewCampaign(
       @PathVariable("loginCustomerId") loginCustomerId: Long,
-      @PathVariable("customerId") customerId: Long
+      @PathVariable("customerId") customerId: Long,
+      @RequestBody request: CreateNewCampaignRequest
   ) {
-    campaigns.save(loginCustomerId, customerId)
+    campaigns.save(loginCustomerId, customerId, request.videoId)
   }
 
   /**

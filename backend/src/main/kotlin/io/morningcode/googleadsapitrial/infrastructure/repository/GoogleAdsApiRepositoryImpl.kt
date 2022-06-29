@@ -167,11 +167,8 @@ class GoogleAdsApiRepositoryImpl(
     }
   }
 
-  override fun addCampaign(loginCustomerId: Long?, customerId: Long) {
+  override fun addCampaign(loginCustomerId: Long?, customerId: Long, videoId: String) {
     val client = buildClient(loginCustomerId)
-
-    // TODO:
-    val videoId = ""
 
     val budgetResourceName = addCampaignBudget(client, customerId)
     val youtubeVideoAssetResourceName = addYouTubeVideoAsset(client, customerId, videoId)
