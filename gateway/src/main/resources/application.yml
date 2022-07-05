@@ -26,7 +26,7 @@ spring:
             client-id:
             client-secret:
             authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:3000/auth/google/callback
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
             scope: profile,email
   cloud:
     gateway:

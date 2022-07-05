@@ -22,7 +22,7 @@ class SecurityConfig {
             .and()
             .antMatcher("/auth/**")
             .authorizeRequests()
-            .antMatchers("/auth/google/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/auth/google/**").permitAll()
             .anyRequest().authenticated()
             .and()
             .oauth2Login()
